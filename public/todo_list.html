@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>TODO List</title>
+	</head>
+	<body>
+	<h1> TODO List</h1>
+	<ul>
+		<li>Pack remaing things for move</li>
+		<li>Buy bus pass</li>
+		<li>Eat dinner</li>
+		<li>Sleep</li>
+	</ul>
+
+	<form method="POST" action="">
+		<h2>Add to the TODO List</h2>
+		<p>
+			<label for="actToAdd">List your next TODO:</label>
+			<input type="text" id="actToAdd" name="actToAdd" value="">
+			</p>
+
+			<p>
+			<label for="dueDate">Due Date: </label>
+			<input type="date" name="dueDate" id="dueDate">
+		</p>
+
+		<p>
+			<label for="priorityLevel">Rate Priority: </label>
+			<select id="priorityLevel" name="priorityLevel">
+				<option value="4">Very Important</option>
+				<option value="3">Important</option>
+				<option value="2">Neutral</option>
+				<option value="1">Not Important/Optional</option>
+			</select>
+		</p>
+	</form>
