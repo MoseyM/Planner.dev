@@ -4,7 +4,6 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 		<!-- Optional theme -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-		<link rel="stylesheet" type="text/css" href="/address_book.css">
 		<title> Address Book </title>
 		<? 
 		// Use a CSV file to save to your list after each valid entry.
@@ -26,11 +25,11 @@
 			if (isset($_POST)) {
 				$inputIncluded = 0;
 				foreach ($_POST as $key => $value) {
-					if(!empty($_POST[$key]) && isset($_POST[$key])) {
+					if(strlen($_POST[$key])>=1) {
 						$inputIncluded++;
 					}
 				}
-					if ($inputIncluded = 5) {
+					if ($inputIncluded >= 5) {
 						return $_POST;
 					}
 					else {
@@ -48,7 +47,7 @@
 		// 	}
 		// }
 
-		$addresses[] = validityOfEntry();
+		
 		saveAddress($addresses);	
 		?>
 	</head>
@@ -67,7 +66,9 @@
 
 			<tr>
 
-				<? foreach ($addresses as $key => $address): ?>
+				<? if (validityOfEntry()):
+					$addresses[] = validityOfEntry();
+					foreach ($addresses as $key => $address): ?>
 					<tr>
 					<!-- once we move forward can remove this and just have the nested foreach -->
 						<? if(is_array($address)):
@@ -79,7 +80,8 @@
 							<td> <?= $address; ?> </td>
 							<? endif; ?>
 					</tr>
-				<? endforeach ?>
+				<? endforeach; 
+				endif; ?>
 		</table>
 	
 		<!-- Create a form that will ask for name, address, city, state, zip, and phone. -->
