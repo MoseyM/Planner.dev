@@ -1,0 +1,64 @@
+
+#dynamicHeader>h1 {
+	font-size: 3em;
+	color: #4C0000;
+	text-decoration: underline;
+	text-align: center;
+	position: relative;
+}
+
+#dynamicHeader {
+	
+	height: 100px;
+	width: 100%;
+	padding: 10px 0px 10px 0px;
+	margin: 10px 0px 10px 0px;
+	position: relative;
+	top: 0px;
+
+}
+
+.fileUpload {
+	clear: right;
+	border-color: white;
+	margin: 15px;
+}
+
+.fileKeys {
+	float: left;	
+}
+body{
+	background-image: url(./img/congruent_pentagon.png);
+	background-repeat: repeat;
+}
+
+.lists {
+
+	color: #3333FF;
+	font-family: Arial, Times, serif;
+	float: left;
+	clear: top;
+	width: 50%;
+}
+
+.lists li {
+	font-family: inherit;
+	color: #660066;
+}
+#formContainer {
+	width: 50%;
+	height: 300px;
+	float: right;
+	background-color: #33995F;
+	border-style: solid;
+	border-color: #4C0000;
+	font-family: cursive, sans-serif;
+	padding: 20px;
+}
+.input form {
+	border-style: groove;
+	border-width: .5px;
+	border-color:inherit;
+}
+
+
