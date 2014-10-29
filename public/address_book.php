@@ -46,9 +46,6 @@
 		// 		}
 		// 	}
 		// }
-
-		
-		saveAddress($addresses);	
 		?>
 	</head>
 
@@ -81,7 +78,9 @@
 							<? endif; ?>
 					</tr>
 				<? endforeach; 
-				endif; ?>
+				endif; 
+				saveAddress($addresses);	
+				?>
 		</table>
 	
 		<!-- Create a form that will ask for name, address, city, state, zip, and phone. -->
