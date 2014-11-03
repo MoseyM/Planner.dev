@@ -9,7 +9,7 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 		<link rel="stylesheet" type="text/css" href="/todo_list.css">
 	</head>
-	<body>
+	<body id="bodyPadding">
 <?php	
 //code to check if we are starting with a new file or a saved/uploaded file
 	$lister = new ToDoLister('csv/todo.csv');
@@ -32,14 +32,13 @@
 
 //runs when "add" is selected in form
 		if(isset($_POST) && !empty($_POST)) {
+			if (!empty($_POST['dueDate'])) {
+				$newDate = date("m-d-Y", strtotime($_POST['dueDate']));
+				$_POST['dueDate'] = $newDate;
+			}
 			$list[] = $_POST;
 			$lister->writeToFile($list);
-		}
-//-------------------------------------------------
-
-	
-//to display the array on the browser.
-?>
+		} ?>
 <!--beginning of content of the webpage-->	
 	<div id="dynamicHeader">
 		<h1> TODO List</h1>
@@ -67,18 +66,20 @@
 	}?>
 		</table>
 	</div>
-	<div id="formContainer" class="form">
-	<form method="POST" action="todo_list.php">
-		<h2 class="form-heading">Add to the TODO List</h2>
-		<p>
+	<div class="form" id="fDesign">
+	<form class="form" method="POST" action="todo_list.php">
+		<div class="form-group">
+		<h2>Add to the TODO List</h2>
+		</div>
+		<div class="form-group">
 			<label for="actToAdd">List your next TODO:</label>
 			<input type="text" id="actToAdd" name="actToAdd" value="">
-			</p>
-			<p>
+		</div>
+		<div class="form-group">
 			<label for="dueDate">Due Date: </label>
 			<input type="date" name="dueDate" id="dueDate">
-		</p>
-		<p>
+		</div>
+		<div class="form-group">
 			<label for="priorityLevel">Rate Priority: </label>
 			<select id="priorityLevel" name="priorityLevel">
 				<option value="4">Very Important</option>
@@ -86,8 +87,10 @@
 				<option value="2">Neutral</option>
 				<option value="1">Not Important/Optional</option>
 			</select>
-		</p>
-		<input type="submit" value="Add">
+		</div>
+		<div class="form-group">
+		<button type="submit" class="btn btn-primary">Primary</button>
+		</div>
 	</form>
 	</div>
 	<div class="fileUpload">
@@ -97,6 +100,7 @@
 		</form>
 	</div>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script src="moment.js"></script>
 	</body>
 	</html>
 

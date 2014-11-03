@@ -1,21 +1,15 @@
-
-#dynamicHeader>h1 {
+#bodyPadding {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+#dynamicHeader {
 	font-size: 3em;
 	color: #4C0000;
-	text-decoration: underline;
 	text-align: center;
 	position: relative;
-}
-
-#dynamicHeader {
-	
-	height: 100px;
-	width: 100%;
-	padding: 10px 0px 10px 0px;
-	margin: 10px 0px 10px 0px;
-	position: relative;
-	top: 0px;
-
+	padding-bottom: 10px;
+	border-bottom: solid 3px black;
+	margin-bottom: 20px;
 }
 
 .fileUpload {
@@ -33,32 +27,20 @@ body{
 }
 
 .lists {
-
-	color: #3333FF;
-	font-family: Arial, Times, serif;
+	padding-top: 20px;
 	float: left;
+	width: 400px;
 	clear: top;
-	width: 50%;
 }
 
 .lists li {
 	font-family: inherit;
 	color: #660066;
 }
-#formContainer {
-	width: 50%;
-	height: 300px;
-	float: right;
-	background-color: #33995F;
-	border-style: solid;
-	border-color: #4C0000;
-	font-family: cursive, sans-serif;
-	padding: 20px;
-}
-.input form {
-	border-style: groove;
-	border-width: .5px;
-	border-color:inherit;
-}
 
+#fDesign {
+	float:right;
+	padding: 0px;
+	width: 200px;
+}
 
