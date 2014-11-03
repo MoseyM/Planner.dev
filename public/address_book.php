@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<? require_once 'includes/includeAddressBookClasses.php'; ?>
 <html>
 	<head>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
@@ -7,55 +8,6 @@
 		<title> Address Book </title>
 		<?php 
 		//this will handle reading and writing to the data file.
-		class AddressDataStore {
-			public $filename = '';
-			public function __construct($filename) {
-				$this->filename = $filename;
-			}
-
-		    public function readAddressBook() {
-		     	$fileLocation = $this->filename;
-				$handle = fopen($fileLocation, 'r');
-				$addressBook = [];
-				//feof will put our pointer at the end of the file. so this condition checks to make sure we are not at the end.
-				while (!feof($handle)) {
-					//setting a variable equal to each line of the csv file
-					$row = fgetcsv($handle);
-					//below we are chking to make sure the row is not empty. and if not we are adding it $row to the array declared above $addressBook
-					$addressBook[] = $row;
-					if (is_null($row)) {
-					}
-				}
-				fclose($handle);
-				return $addressBook;
-		    }
-
-		    public function writeAddressBook($addresses) {
-		         // Code to write $addressesArray to file $this->filename
-		     	$handle=fopen($this->filename, 'w');
-				if($addresses){
-				foreach ($addresses as $addressArray => $value) {
-					if(is_array($value)) {
-						//writes to the file
-						fputcsv($handle, $value);
-					}
-				}
-			}
-				fclose($handle);
-		    }
-		}
-
-		$userAddresses = new AddressDataStore('csv/addressBook.csv');
-		$addresses = $userAddresses->readAddressBook();
-		//will delete once link is pressed.
-		if(isset($_GET['id'])) {
-			$index = $_GET['id'];
-				// This will delete the selected todo item
-				unset($addresses[$index]);
-				$userAddresses->writeAddressBook($addresses); 
-			}
-
-		//check for a valid entry here...if/else
 		function validityOfEntry($addresses) {
 			$keysChecked = 0;
 			if (!empty($_POST)) {
@@ -75,14 +27,17 @@
 				return $addresses;
 			}
 		}
-		$addresses = validityOfEntry($addresses);
-		$userAddresses->writeAddressBook($addresses); 
-
-		
-		
-
-		//$newAddress is the new entry we collected by selecting "CompleteAddress" so we will only append to $addresses if pass validityOfEntry function.
-		
+		$userAddresses = new AddressDataStore('csv/addressBook.csv');
+		$addresses = $userAddresses->readAddressBook();
+		if(!empty($_POST)){	
+			$addresses = validityOfEntry($addresses);
+			$userAddresses->writeAddressBook($addresses); 
+		}
+		if(isset($_GET['idx'])){
+			$index = $_GET['idx'];
+			unset($addresses[$index]);
+			$userAddresses->writeAddressBook($addresses);
+		}
 		?>
 	</head>
 	<body class="container-fluid">
@@ -102,19 +57,14 @@
 			<?php
 			if (isset($addresses) && !empty($addresses)) {
 				foreach ($addresses as $key => $address) {
-					if(is_array($address) && !false && !null) {
-						echo "<tr>";
-							foreach ($address as $key2 => $value) {
-								echo "<td> $value </td>";
-							}
-							//To add an X at the end of each row to delete the row
-							// <a href=\"?id=$key\"> &#88; </a>
-							echo "<td><a href=\"?id=$key\"> &#88; </a></td>";
-						echo "</tr>";
+					echo "<tr>";
+						foreach ($address as $key2 => $value) {
+							echo "<td> $value </td>";
+						}
+					echo "<td><a href=\"?idx=$key\"> &#88; </a></td>";
+					echo "</tr>";
 					}
-				}
-			}	
-			?>
+			}?>
 		</table>
 	
 		<!-- Create a form that will ask for name, address, city, state, zip, and phone. -->
