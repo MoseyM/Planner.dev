@@ -5,6 +5,7 @@
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 		<!-- Optional theme -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="address_book.css">
 		<title> Address Book </title>
 		<?php 
 		//this will handle reading and writing to the data file.
@@ -12,8 +13,8 @@
 			$keysChecked = 0;
 			if (!empty($_POST)) {
 				foreach ($_POST as $key => $value) {
-					if($key =='phone'){
-					}
+					if($key =='phone') {
+						}
 					elseif ($value == false) {
 						echo "<p>Please enter your $key<p>";
 					}
@@ -41,7 +42,7 @@
 		?>
 	</head>
 	<body class="container-fluid">
-
+	<h1 id="header">Address Book</h1>
 	<!-- Created table to output the information submitted through the form for the address book -->
 		<table class="table table-striped">
 			<tr>
@@ -68,43 +69,46 @@
 		</table>
 	
 		<!-- Create a form that will ask for name, address, city, state, zip, and phone. -->
+		<div id="formDesign">
 		<form class="form" method="POST" action="address_book.php">
 			<div class="form-group">
 				<label for="name">Name: </label>
-				<input id="name" class="form-control" name="name" type="text">
+				<input id="name" class="form-control inputWidth" name="name" type="text">
 			</div>
 
 			<div class="form-group">			
 				<label for="address">Address: </label>
-				<input id="address" class="form-control" name="address" type="text">
+				<input id="address" class="form-control inputWidth" name="address" type="text">
 			</div>
 
 			<div class="form-group">
 				<label for="city">City: </label>
-				<input id="city" class="form-control" name="city" type="text">
+				<input id="city" class="form-control inputWidth" name="city" type="text">
 			</div>
 
 			<div class="form-group">
 				<label for="state">State: </label>
-				<input id="state" class="form-control"  name="state" type="text">
+				<input id="state" class="form-control inputWidth"  name="state" type="text">
 			</div>
 
 			<div class="form-group">
 				<label for="zip">Zip: </label>
-				<input id="zip" class="form-control" name="zip" type="text">
+				<input id="zip" class="form-control inputWidth" name="zip" type="text">
 			</div>
 
 			<div class="form-group">
 				<label for="phone">Phone: </label>
-				<input id="phone" class="form-control"  name="phone" type="text">
+				<input id="phone" class="form-control inputWidth"  name="phone" type="text">
 			</div>
 
 			<div class="form-group">
-				<input type="submit" value="CompleteAddress">
+				<button type="submit" class="btn btn-primary">CompleteAddress</button>
 			</div>
 		</form>
-	</div> 
+	</div>
+</div> 
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<script src="moment.js"></script>
 	</body>
 
 </html>

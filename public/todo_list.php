@@ -12,8 +12,8 @@
 	<body id="bodyPadding">
 <?php	
 //code to check if we are starting with a new file or a saved/uploaded file
-	$lister = new ToDoLister('csv/todo.csv');
-	$list = $lister-> openFile();
+	$lists = new ToDoLister('csv/todo.csv');
+	$lists->list = $lists-> openFile();
 // Code for the email information when a file is uploaded
 	if(count($_FILES)> 0 && $_FILES['file1']['error'] == UPLOAD_ERR_OK) {
 			if ($_FILES['file1']['type'] == 'text/csv') {
@@ -22,7 +22,14 @@
 				$filename = basename($_FILES['file1']['name']);
 				$savedFilename = $uploadDir.$filename;
 				//the file is saved temporarily so we are moving it from the temp location to a permanent location which file address and name with extension was creted with the $savedFilename var.
-				move_uploaded_file($_FILES['file1']['tmp_name'], $savedFilename);		}
+				move_uploaded_file($_FILES['file1']['tmp_name'], $savedFilename);
+				//need to create a new object for the new filename. File hasn't been converted to an array yet.
+				$list2 = new ToDoLister("uploads/".$filename);
+				//converts info to an array.
+				$list2->list = $list2->openFile();
+				$lists->list = array_merge($lists->list, $list2->list);
+				$lists->writeToFile();
+			}
 			else {
 				echo "<p> Please attach a csv file</p>";
 			}	
@@ -36,9 +43,14 @@
 				$newDate = date("m-d-Y", strtotime($_POST['dueDate']));
 				$_POST['dueDate'] = $newDate;
 			}
-			$list[] = $_POST;
-			$lister->writeToFile($list);
-		} ?>
+			$lists->list[] = $_POST;
+			$lists->writeToFile();
+		} 
+		if(isset($_GET['id'])) {
+			$index = $_GET['id'];
+			unset($lists->list[$index]);
+			$lists->writeToFile();
+		}?>
 <!--beginning of content of the webpage-->	
 	<div id="dynamicHeader">
 		<h1> TODO List</h1>
@@ -53,17 +65,13 @@
 		 	</tr>
 		 	<tr>
 				 <?php
-				foreach ($list as $key => $value) {
+				foreach ($lists->list as $key => $value) {
 						foreach ($value as $listTitle => $listValue){
 				 	 		echo "<td> $listValue </td>";
 						}
 						echo "<td><a href=\"?id=$key\"> &#88 </td>";
 						echo "</tr>";
-					} if(isset($_GET['id'])) {
-		$index = $_GET['id'];
-		unset($list[$index]);
-		$lister->writeToFile($list);
-	}?>
+					}?>
 		</table>
 	</div>
 	<div class="form" id="fDesign">

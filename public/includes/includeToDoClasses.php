@@ -2,6 +2,7 @@
 
 class ToDoLister {
 	public $fileLocation = "";
+	public $list = [];
 	public function __construct($fileLocation) {
 				$this->fileLocation = $fileLocation;
 			}
@@ -24,12 +25,22 @@ class ToDoLister {
 	    return $newinfo;
 	}
 
-	function writeToFile($array) {
+	function writeToFile() {
+		$list = $this->list;
 		$fileLocation = $this->fileLocation;
 		$handle = fopen($fileLocation, 'w');
-		foreach($array as $eachSet) {
+		
+		// $list = $this->sanitize($list);
+		foreach($list as $eachSet) {
 			fputcsv($handle, $eachSet);
 		}
 		fclose($handle);
+	}
+	function sanitize($list){
+		$list = $this->list;
+		foreach($list as $key=> $value) {
+			$list[$key] = htmlspecialchars(strip_tags($value));
+		}
+		return $list;
 	}
 }
