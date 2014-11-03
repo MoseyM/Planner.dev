@@ -8,36 +8,36 @@
 		<link rel="stylesheet" href="address_book.css">
 		<title> Address Book </title>
 		<?php 
-		//this will handle reading and writing to the data file.
-		function validityOfEntry($addresses) {
-			$keysChecked = 0;
-			if (!empty($_POST)) {
-				foreach ($_POST as $key => $value) {
-					if($key =='phone') {
-						}
-					elseif ($value == false) {
-						echo "<p>Please enter your $key<p>";
-					}
-					else {
-						++$keysChecked;
-					}
-				}
-				if($keysChecked >= 5) {
-					$addresses[]=$_POST;
-				}
-				return $addresses;
+		if(count($_FILES)> 0 && $_FILES['file1']['error'] == UPLOAD_ERR_OK) {
+			if ($_FILES['file1']['type'] == 'text/csv') {
+				$uploadDir = '/vagrant/sites/planner.dev/public/uploads/';
+				// filename var is giving the file name with extension
+				$filename = basename($_FILES['file1']['name']);
+				$savedFilename = $uploadDir.$filename;
+				//the file is saved temporarily so we are moving it from the temp location to a permanent location which file address and name with extension was creted with the $savedFilename var.
+				move_uploaded_file($_FILES['file1']['tmp_name'], $savedFilename);
+				//need to create a new object for the new filename. File hasn't been converted to an array yet.
+				$addresses2 = new AddressDataStore("uploads/".$filename);
+				//converts info to an array.
+				$addresses2->addresses = $addresses2->readAddressBook();
+				$userAddresses->addresses = array_merge($userAddresses->addresses, $addresses2->addresses);
+				$userAddresses->writeAddressBook();
 			}
+			else {
+				echo "<p> Please attach a csv file</p>";
+			}	
 		}
+
 		$userAddresses = new AddressDataStore('csv/addressBook.csv');
-		$addresses = $userAddresses->readAddressBook();
+		$userAddresses->addresses = $userAddresses->readAddressBook();
 		if(!empty($_POST)){	
-			$addresses = validityOfEntry($addresses);
-			$userAddresses->writeAddressBook($addresses); 
+			$userAddresses->addresses[] = $_POST;
+			$userAddresses->writeAddressBook(); 
 		}
 		if(isset($_GET['idx'])){
 			$index = $_GET['idx'];
-			unset($addresses[$index]);
-			$userAddresses->writeAddressBook($addresses);
+			unset($userAddresses->addresses[$index]);
+			$userAddresses->writeAddressBook();
 		}
 		?>
 	</head>
@@ -56,8 +56,8 @@
 			</tr>
 
 			<?php
-			if (isset($addresses) && !empty($addresses)) {
-				foreach ($addresses as $key => $address) {
+			if (isset($userAddresses->addresses) && !empty($userAddresses->addresses)) {
+				foreach ($userAddresses->addresses as $key => $address) {
 					echo "<tr>";
 						foreach ($address as $key2 => $value) {
 							echo "<td> $value </td>";
@@ -104,6 +104,12 @@
 			<div class="form-group">
 				<button type="submit" class="btn btn-primary">CompleteAddress</button>
 			</div>
+		</form>
+	</div>
+	<div>
+		<form method="POST" enctype="multipart/form-data" action="todo_list.php">
+			<input type="file" class="fileKeys" id="file1" name="file1">
+			<input type="submit" class="fileKeys" value="SendFile">
 		</form>
 	</div>
 </div> 

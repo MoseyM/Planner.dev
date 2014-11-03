@@ -1,3 +1,11 @@
-#submitAlign {
-	vertical-align: center;
+#header {
+	border-bottom: black 3px solid;
+	text-align: center;
+	padding-bottom: 20px;
+}
+
+#formDesign {
+	width: 70%;
+	border: solid 1px #F6CED8;
+	padding: 15px;
 }
