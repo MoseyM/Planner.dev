@@ -5,7 +5,8 @@ class ToDoLister {
 	public $list = [];
 	public function __construct($fileLocation) {
 				$this->fileLocation = $fileLocation;
-			}
+		}
+
 	function openFile() {
 		$fileLocation = $this->fileLocation;
 	    $handle = fopen($fileLocation, 'r');

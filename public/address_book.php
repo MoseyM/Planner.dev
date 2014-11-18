@@ -1,5 +1,23 @@
+<?php require_once '../includes/filestore.php' ;
+require_once '../includes/AddressBookClasses.php'; 
+$userAddresses = new AddressDataStore("../data/addressBookStore.csv");
+// uploadFile() will only run when a file is uploaded through the browser
+if(count($_FILES)> 0 && $_FILES['file1']['error'] == UPLOAD_ERR_OK) {
+	$userAddresses->uploadFile();
+}
+$userAddresses->addresses = $userAddresses->read();
+if(!empty($_POST)){	
+	$userAddresses->addresses = $userAddresses->validityOfEntry();
+	$userAddresses->write($userAddresses->addresses); 
+	$userAddresses->read();
+}
+//change to make it a jquery function. Should not use GET to change data
+if(!empty($_GET['idx'])){
+	$index = $_GET['idx'];
+	unset($userAddresses->addresses[$index]);
+	$userAddresses->write($userAddresses->addresses);
+}?>
 <!DOCTYPE html>
-<? require_once 'includes/includeAddressBookClasses.php'; ?>
 <html>
 	<head>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
@@ -8,39 +26,8 @@
 		<link rel="stylesheet" href="address_book.css">
 		<title> Address Book </title>
 		<?php 
-		if(count($_FILES)> 0 && $_FILES['file1']['error'] == UPLOAD_ERR_OK) {
-			if ($_FILES['file1']['type'] == 'text/csv') {
-				$uploadDir = '/vagrant/sites/planner.dev/public/uploads/';
-				// filename var is giving the file name with extension
-				$filename = basename($_FILES['file1']['name']);
-				$savedFilename = $uploadDir.$filename;
-				//the file is saved temporarily so we are moving it from the temp location to a permanent location which file address and name with extension was creted with the $savedFilename var.
-				move_uploaded_file($_FILES['file1']['tmp_name'], $savedFilename);
-				//need to create a new object for the new filename. File hasn't been converted to an array yet.
-				$addresses2 = new AddressDataStore("uploads/".$filename);
-				//converts info to an array.
-				$addresses2->addresses = $addresses2->readAddressBook();
-				$userAddresses->addresses = array_merge($userAddresses->addresses, $addresses2->addresses);
-				$userAddresses->writeAddressBook();
-			}
-			else {
-				echo "<p> Please attach a csv file</p>";
-			}	
-		}
-
-		$userAddresses = new AddressDataStore('csv/addressBook.csv');
-		$userAddresses->addresses = $userAddresses->readAddressBook();
-		if(!empty($_POST)){	
-			$userAddresses->addresses[] = $_POST;
-			$userAddresses->writeAddressBook(); 
-		}
-		if(isset($_GET['idx'])){
-			$index = $_GET['idx'];
-			unset($userAddresses->addresses[$index]);
-			$userAddresses->writeAddressBook();
-		}
+			
 		?>
-	</head>
 	<body class="container-fluid">
 	<h1 id="header">Address Book</h1>
 	<!-- Created table to output the information submitted through the form for the address book -->
@@ -56,7 +43,7 @@
 			</tr>
 
 			<?php
-			if (isset($userAddresses->addresses) && !empty($userAddresses->addresses)) {
+			if (!empty($userAddresses->addresses)) {
 				foreach ($userAddresses->addresses as $key => $address) {
 					echo "<tr>";
 						foreach ($address as $key2 => $value) {
@@ -113,6 +100,7 @@
 		</form>
 	</div>
 </div> 
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<script src="moment.js"></script>
 	</body>
