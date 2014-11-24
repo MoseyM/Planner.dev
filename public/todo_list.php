@@ -1,22 +1,37 @@
-<?php require_once '../includes/filestore.php'; 
-	require_once '../includes/todoClass.php';
-	$toDos = new todoClass('../data/todoClasses.txt');
-	$toDos->todoList = $toDos->read();
+<?php 
+define('DB_HOST', '127.0.0.1');
+define('DB_NAME', 'ToDo_List');
+define('DB_USER','queen');
+define('DB_PASS','password');
+
+require '../includes/db_connect.php';
+//this will return the information from our todo database into an array.
+function get_Data($dbc) {
+	$query = "SELECT * FROM ToDo_List ORDER BY todo LIMIT 10";
+	$stmt = $dbc->query($query);
+	return $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	}
+function send_Data($array, $dbc) {
+		$query = "INSERT INTO ToDo_List(todo, due_date, priority) VALUES({$array['todo']},{$array['due_date']},{$array['priority']})";
+		$dbc->exec($query);
+		}
+
+function changeDate($string) {
+	$newTime = strtotime($string);
+	return $newTime;
+}
+//-----------------------------
+$todoList = get_Data($dbc);
 	if(!empty($_POST)) {
-		$toDos->CheckForLength();
-		$toDos->todoList[] = $_POST['actToAdd'];
-		$toDos->write($toDos->todoList);		
-	} 
-	if(count($_FILES)> 0 && $_FILES['file1']['error'] == UPLOAD_ERR_OK) {
-		$toDos->testType();	
+		if (strlen($_POST['todo']) > 240 || empty($_POST['todo'])) {
+			throw new Exception('Please provide a Todo Item less than 256 characters.');	
+		}
+		if(!empty($_POST['due_date'])) {
+			$_POST['due_date'] = changeDate($_POST['due_date']);
+		}
+		
+		send_Data($_POST, $dbc);		
 	}
-
-	if(isset($_GET['id'])) {
-		$index = $_GET['id'];
-		unset($toDos->todoList[$index]);
-		$toDos->write($toDos->todoList);
-	}
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -37,12 +52,22 @@
 		<table class="table table-striped">
 		 	<tr>
 		 		<th> The Task </th>
+		 		<th> Date </th>
+		 		<th> Priority </th>
 		 		<th> Task Done? </th>
 		 	</tr>
 		 	<tr>
 				 <?php
-				foreach ($toDos->todoList as $key => $value) {
-					echo "<td> $value </td>";
+				foreach ($todoList as $key => $value) {
+					foreach ($value as $col => $detail) {
+						if ($col == 'id') {
+							continue;
+						}
+						if ($col == 'due_date') {
+						$detail = changeDate($detail);
+					}
+						echo "<td> $detail</td>";
+					}
 					echo "<td><a href=\"?idx=$key\"> &#88; </a></td>";
 					echo "</tr>";
 				}
@@ -53,25 +78,32 @@
 	<form class="form" method="POST" action="todo_list.php">
 		<div class="form-group">
 		<h2>Add to the TODO List</h2>
-		</div>
+			</div>
 		<div class="form-group">
-			<label for="actToAdd">List your next TODO:</label>
-			<input type="text" id="actToAdd" name="actToAdd" value="">
+			<label for="todo">List your next TODO:</label>
+			<input type="text" id="todo" name="todo" value=<?= isset($_POST['todo']) ? $_POST['todo']: '' ?>>
+			</div>
+		<div class="form-group">
+			<label for="priority">Set Priority</label>
+			<select id="priority" name="priority">
+				<option value="4" selected="selected">Very Important</option>
+		        <option VALUE="3"> Important</option>
+		        <option VALUE="2"> Need to Do But Not Soon</option>
+		        <option VALUE="1"> Optional Task</option> 
+		    </select> 
+		    </div>
+		<div class="form-group">
+		    <label for="due_date">Due Date for Task</label>
+		    <!-- sets date but will keep as is if something is selected -->
+			<input type="date" id="due_date" name="due_date" value=				<?= isset($_POST['due_date']) ? $_POST['due_date']: '' ?>>
 		</div>
 		<div class="form-group">
 		<button type="submit" class="btn btn-primary">Primary</button>
 		</div>
 	</form>
 	</div>
-	<div class="fileUpload">
-		<form method="POST" enctype="multipart/form-data" action="todo_list.php">
-			<input type="file" class="fileKeys" id="file1" name="file1">
-			<input type="submit" class="fileKeys" value="SendFile">
-		</form>
-	</div>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<script src="moment.js"></script>
 	</body>
-	</html>
-
+</html>
