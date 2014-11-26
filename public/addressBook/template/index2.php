@@ -1,5 +1,6 @@
 <?php
-    //connect to host
+
+//connect to host
     define("DB_HOST", '127.0.0.1');
     define("DB_NAME", "addressBook");
     define("DB_USER", "queen");
@@ -7,43 +8,96 @@
 
     require '../inc/db_connect.php';
     require_once '../inc/addressclass.php';
-
-    $address = new AddressBook($dbc);
+    
+//find total number of rows and build pagination from that count
+    $pageLimit = 10;
+    $count = $dbc->query("SELECT COUNT(*) FROM addresses");
+    $pageCount = $count->fetchColumn();
+    $pages = ceil($pageCount / $pageLimit);
+    $lastPage = $pages;
+    
+    $addresses = [];
+    
+//define page number
+    (isset($_GET['page']) && $_GET['page'] >= 1) ? $current_page = $_GET['page'] : $current_page = 1;
+    
+//delete item
     if(!empty($_GET))
-        { 
-            $id = $_GET['id'];
-            if(isset($_GET['id']))
+    {
+        if(isset($_GET['id']))
             {
-                $address->deleteEntryPerson($id);
+                $id = $_GET['id'];
+                $stmt = $dbc->query("DELETE FROM person WHERE id=$id");
+                header("Location: http://planner.dev/addressBook/template/index.php");
             }
-            if(isset($_GET['address']))
-            {
-                $idAddress = $_GET['address'];
-                $address->deleteEntryAddress($idAddress); 
-            }
+        if(isset($_GET['address']))
+        {
+            $removeAddress = $_GET['address'];
+            $stmt = $dbc->query("DELETE FROM addresses WHERE person_id=$removeAddress");
             header("Location: http://planner.dev/addressBook/template/index.php");
         }
+        
+    }
 
-    $addressInfo = $address->definePageNumber();
-    //checking $_POST for submission
+//query "addresses" database
+    $offsetQuery = ($current_page -1) *10;
+    $query = "SELECT person.id, firstname, lastname, email, phone, address, city, state, zip, addresses.id AS add_id, person_id
+        FROM person LEFT JOIN addresses ON addresses.person_id = person.id  LIMIT :pageLimit OFFSET :offset";
+    $stmt = $dbc->prepare($query);
+
+    $stmt->bindValue(':pageLimit',  $pageLimit,  PDO::PARAM_INT);
+    $stmt->bindValue(':offset',  $offsetQuery,  PDO::PARAM_INT);
+
+    $stmt->execute();
+    
+    $addressInfo = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+//checking $_POST for submission
     if(!empty($_POST))
     {
-        //validating name is set
+        
+    //validating name is set
         if((isset($_POST['firstname'])) && (isset($_POST['lastname'])))
         {
-            $contactId = $address->addEntryPerson();
-            if((isset($_POST['firstname']))){ 
-                $address->addEntryAddress($contactId);
-            }
-                header("Location: http://planner.dev/addressBook/template/index.php");
+            
+        // logic for person table
+            $query = "INSERT INTO person (firstname, lastname) 
+                       VALUES (:firstname, :lastname)";
+            
+            $stmt = $dbc->prepare($query);
+            
+            $stmt->bindValue(':firstname',  $_POST['firstname'],  PDO::PARAM_STR);
+            $stmt->bindValue(':lastname',  $_POST['lastname'],  PDO::PARAM_STR);
+            
+            $stmt->execute();
+            $contactId = $dbc->lastInsertId();
+            
+            !empty($_POST['email']) ? $_POST['email'] : null;
+            !empty($_POST['phone']) ? $_POST['phone'] : null;
+            !empty($_POST['address']) ? $_POST['address'] : null;
+            !empty($_POST['city']) ? $_POST['city'] : null;
+            !empty($_POST['state']) ? $_POST['state'] : null;
+            !empty($_POST['zip']) ? $_POST['zip'] : null;
+            
+        // logic for addresses table
+            $query = "INSERT INTO addresses (person_id, email, phone, address, city, state, zip) 
+                        VALUES (:person_id, :email, :phone, :address, :city, :state, :zip)";
+                        
+            $stmt = $dbc->prepare($query);
+
+            $stmt->bindValue(':person_id',  $contactId,  PDO::PARAM_STR);
+            $stmt->bindValue(':email',  $_POST['email'],  PDO::PARAM_STR);
+            $stmt->bindValue(':phone',  $_POST['phone'],  PDO::PARAM_STR);
+            $stmt->bindValue(':address',  $_POST['address'],  PDO::PARAM_STR);
+            $stmt->bindValue(':city',  $_POST['city'],  PDO::PARAM_STR);
+            $stmt->bindValue(':state',  $_POST['state'],  PDO::PARAM_STR);
+            $stmt->bindValue(':zip',  $_POST['zip'],  PDO::PARAM_INT);
+            
+            $stmt->execute();
+            header("Location: http://planner.dev/addressBook/template/index.php");
         }
-}
-    if(isset($_POST['hidden_id']))
-    {
-        $address->editEntryAddress();   
-        // editing person table
-        $address->editEntryPerson();
-        header("Location: http://planner.dev/addressBook/template/index.php");  
+        }
+            
     }
 ?>
 <!DOCTYPE html>
@@ -95,10 +149,10 @@
                     DELETE
                 </a>
             </td>
-            <td><?= htmlspecialchars(strip_tags($address['firstname'])); ?></td>
-            <td><?= htmlspecialchars(strip_tags($address['lastname'])); ?></td>
+            <td id="person-firstName-<?= $address['id'] ?>"><?= htmlspecialchars(strip_tags($address['firstname'])); ?></td>
+            <td id="person-lastName-<?= $address['id'] ?>"><?= htmlspecialchars(strip_tags($address['lastname'])); ?></td>
             <td>
-                <a data-toggle="modal" href="" data-target="#edit-modal" class="add-button">
+                <a data-edit-person="<?= $address['id']; ?>" data-toggle="modal" href="" data-target="#edit-modal" class="edit-button">
                     EDIT |
                 </a>
             
@@ -106,12 +160,12 @@
                     DELETE
                 </a>
             </td>
-            <td><?= htmlspecialchars(strip_tags($address['address'])); ?></td>
-            <td><?= htmlspecialchars(strip_tags($address['city'])); ?></td>
-            <td><?= htmlspecialchars(strip_tags($address['state'])); ?></td>
-            <td><?= htmlspecialchars(strip_tags($address['zip'])); ?></td>
-            <td><?= htmlspecialchars(strip_tags($address['phone'])); ?></td>
-            <td><?= htmlspecialchars(strip_tags($address['email'])); ?></td>
+            <td id="person-address-<?= $address['id'] ?>"><?= htmlspecialchars(strip_tags($address['address'])); ?></td>
+            <td id="person-city-<?= $address['id'] ?>"><?= htmlspecialchars(strip_tags($address['city'])); ?></td>
+            <td id="person-state-<?= $address['id'] ?>"><?= htmlspecialchars(strip_tags($address['state'])); ?></td>
+            <td id="person-zip-<?= $address['id'] ?>"><?= htmlspecialchars(strip_tags($address['zip'])); ?></td>
+            <td id="person-phone-<?= $address['id'] ?>"><?= htmlspecialchars(strip_tags($address['phone'])); ?></td>
+            <td id="person-email-<?= $address['id'] ?>"><?= htmlspecialchars(strip_tags($address['email'])); ?></td>
         </tr> 
     
             <?php endforeach ?>     
@@ -177,6 +231,7 @@
                                   <div class="form-group">
                                     <input type="text" class="modal-form-control text-center" id="last-name" placeholder="Email" name="email">
                                   </div>
+                                 
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button>
                                         <button type="submit" class="btn btn-success">add</button>
@@ -187,8 +242,8 @@
                 </div>
             </div>
         </div>
-<!-- edit Modal -->
-<div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+     <!-- Edit Address Modal -->
+        <div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content modal-content-edit">
                 <div class="modal-header">
@@ -236,16 +291,8 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript">
-        // var toggle = function() {
-        //     var mydiv = document.getElementById('collapse');
-        //     if (mydiv.style.display === 'inline' || mydiv.style.display === '')
-        //         mydiv.style.display = 'none';
-        //     else
-        //         mydiv.style.display = 'inline';
-        // }
-
-        // add code to autofill
-        //auto-populating database info into edit modal
+    
+    //auto-populating database info into edit modal
         $('.edit-button').click(function()
         {
             var personId = $(this).data('edit-person');
@@ -272,6 +319,9 @@
             $("#remove-person").val([personId, addressId]);
             $("#editContactModal").modal();
         });
+
+
+
     </script>
     <footer></footer>
 </html>

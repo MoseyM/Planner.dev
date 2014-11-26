@@ -47,6 +47,27 @@ class AddressBook
         $stmt->execute();
 	}
 
+	function editEntryAddress() {
+		$stmt = $this->dbc->prepare("UPDATE person SET firstname = :firstname, lastname = :lastname WHERE id = :id");  
+        $stmt->bindValue(':firstname',  $_POST['edit_firstname'],  PDO::PARAM_STR);
+        $stmt->bindValue(':lastname',  $_POST['edit_lastname'],  PDO::PARAM_STR);
+        $stmt->bindValue(':id',  $_POST['hidden_id'],  PDO::PARAM_STR);
+        $stmt->execute();
+	}
+
+	function editEntryPerson() {
+		$stmt = $this->dbc->prepare("UPDATE addresses SET email = :email, phone = :phone, address = :address, city = :city, state = :state, zip = :zip WHERE person_id = :person_id");     
+		$stmt->bindValue(':person_id',  $_POST['hidden_id'],  PDO::PARAM_STR);
+        $stmt->bindValue(':email',  $_POST['edit_email'],  PDO::PARAM_STR);
+        $stmt->bindValue(':phone',  $_POST['edit_phone'],  PDO::PARAM_STR);
+        $stmt->bindValue(':address',  $_POST['edit_address'],  PDO::PARAM_STR);
+        $stmt->bindValue(':city',  $_POST['edit_city'],  PDO::PARAM_STR);
+        $stmt->bindValue(':state',  $_POST['edit_state'],  PDO::PARAM_STR);
+        $stmt->bindValue(':zip',  $_POST['edit_zip'],  PDO::PARAM_INT);
+        $stmt->execute();
+        $contactId = $this->dbc->lastInsertId();
+	}
+
 	function verifyAddress() {
 		!empty($_POST['email']) ? $_POST['email'] : null;
         !empty($_POST['phone']) ? $_POST['phone'] : null;
