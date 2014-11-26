@@ -166,12 +166,7 @@ require "../inc/db_connect.php";
                     DELETE
                 </a>
             </td>
-            <td>24907 Crescent Trce</td>
-            <td>San Antonio</td>
-            <td>TX</td>
-            <td>78258</td>
-            <td>(210) 928-7710</td>
-            <td>patrickrodo@yahoo.com</td>
+            
         </tr> 
         
     </table>        

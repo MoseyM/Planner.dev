@@ -10,7 +10,7 @@ class Person extends Parent {
 			if ($key == 'firstname') {
 				$firstname = $value;
 			} else {
-				$lastname = value;
+				$lastname = $value;
 			}
 		}
 		$dbc->bindValue(':firstname', $firstname, PDO::PARAM_STR);
@@ -19,5 +19,5 @@ class Person extends Parent {
 	}
 
 	function delete() {
-		
+
 }
