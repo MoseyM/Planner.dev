@@ -31,7 +31,7 @@ require "../inc/db_connect.php";
     <div class="container-name add-name">
         <div class="row row-border">
             <div class="col-md-3">
-                <h4><a data-toggle="modal" href="" data-target="#add-modal" id="add-name-header">Add Entry</a></h4>
+                <h4><a data-toggle="modal" href="" data-target="#update-modal" id="add-name-header">Add Entry</a></h4>
             </div>
         </div>
     </div>
@@ -74,9 +74,8 @@ require "../inc/db_connect.php";
             <td>Patrick</td>
             <td>Rodo</td>
             <td>
-                <a data-toggle="modal" href="" data-target="#add-modal" class="edit-button">
-                    EDIT |
-                </a>    
+                <a data-toggle="modal" href="" id="edit-modal" data-target="#update-modal" class="edit-button">
+                    EDIT | </a>    
                 <a data-toggle="modal" href="" data-target="#deleteAddress" class="remove-button">
                     DELETE
                 </a>
@@ -95,7 +94,7 @@ require "../inc/db_connect.php";
                   </div>
                 </div>
                 <!-- Add Address Modal -->
-                <div class="modal fade" id="add-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal fade" id="update-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -103,19 +102,19 @@ require "../inc/db_connect.php";
                             <div class="modal-body">
                                 <form method="POST">
                                   <div class="form-group">
-                                    <input type="text" class="modal-form-control text-center" id="first-name" name="firstname" placeholder="First Name">
+                                    <input type="text" class="modal-form-control text-center" id="first-name" name="firstname" class="edit" placeholder="First Name">
                                   </div>
                                   <div class="form-group">
-                                    <input type="text" class="modal-form-control text-center" id="last-name" name = "lastname" placeholder="Last Name">
+                                    <input type="text" class="modal-form-control text-center" id="last-name" name = "lastname" class="edit" placeholder="Last Name">
                                   </div>
                                   <div class="form-group">
-                                    <input type="text" class="modal-form-control text-center" id="address" name="address" placeholder="Address">
+                                    <input type="text" class="modal-form-control text-center" id="address" name="address" class="edit" placeholder="Address">
                                   </div>
                                   <div class="form-group">
-                                    <input type="text" class="modal-form-control text-center" id="city" name="city" placeholder="City">
+                                    <input type="text" class="modal-form-control text-center" id="city" name="city" class="edit" placeholder="City">
                                   </div>
                                   <div class="form-group">
-                                    <input type="text" class="modal-form-control text-center" id="state" name="state" placeholder="State">
+                                    <input type="text" class="modal-form-control text-center" id="state" name="state" class="edit" placeholder="State">
                                   </div>
                                   <div class="form-group">
                                     <input type="text" class="modal-form-control text-center" id="zipcode" name="zip" placeholder="Zipcode">
@@ -124,16 +123,11 @@ require "../inc/db_connect.php";
                                     <input type="text" class="modal-form-control text-center" id="phone-number" name="phone" placeholder="Phone Number">
                                   </div>
                                   <div class="form-group">
-                                    <input type="text" class="modal-form-control text-center" id="email" name="email" placeholder="Email">
+                                    <input type="text" class="modal-form-control text-center" id="email" name="email" class="edit" placeholder="Email">
                                   </div>
                             </div>
                             <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button> <button type="submit" class="btn btn-success"><a href="?id=0">add</a></button>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">cancel</button> <button type="submit" class="btn btn-success" value="add"><a href="?id=add">add</a></button> <button type="submit" class="btn btn-success" value="edit"><a href="?id=edit">Update Entry</a></button>
             </td>
             <td>24907 Crescent Trce</td>
             <td>San Antonio</td>
@@ -206,6 +200,11 @@ require "../inc/db_connect.php";
         $(window).on("resize", function () {
             $('.modal:visible').each(centerModal);
         });
+        // $('#edit-modal').click(function() {
+        //             $('.edit-modal').each(function() {
+        //                 $(this).val()
+        //             });
+        //         });
     </script>
     <footer></footer>
 </html>
