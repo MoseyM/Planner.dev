@@ -1,0 +1,141 @@
+body {
+	height: 100%;
+}
+
+#address-header {
+	color: black;
+	font-family: 'Montserrat', sans-serif;
+}
+
+#first-hr {
+	margin-top: .7em;
+	margin-right: 0;
+	margin-left: 0;
+	margin-bottom: 0;
+	width: 3.7em;
+	border-top: 1px solid black;
+	padding: 0;
+}
+
+#second-hr {
+	margin-top: .7em;
+	margin-right: 0;
+	margin-left: 0;
+	margin-bottom: 0;
+	width: 6.5em;
+	border-top: 1px solid black;
+	padding: 0;
+
+}
+
+.container-name {
+  padding-right: 0;
+  padding-left: 0;
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.col-md-2 {
+	width: 8.00%;
+	padding-right: 0;
+}
+
+.col-md-10 {
+	padding-left: 0;
+}
+
+.row-border {
+	border-top: 1px solid #ddd;
+	background-color: #f9f9f9;
+}
+
+th, td{
+	font-family: 'Nunito', sans-serif;
+}
+
+.modal-header {
+	text-align: center;
+}
+
+.modal-body {
+	position: relative;
+	padding: 15px;
+	text-align: center;
+}
+
+.modal-footer {
+	text-align: center;
+	border-top: none;
+	padding: 0 15px 15px 15px;
+}
+
+.form-control {
+	width: 20%;
+}
+
+.form-margin {
+	margin-top: 3px;
+}
+
+.modal-form-control {
+	display: center;
+	width: 40%;
+	height: 34px;
+	padding: 6px 12px;
+	font-size: 14px;
+	line-height: 1.42857143;
+	color: #555;
+	background-color: #fff;
+	background-image: none;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+	box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+	-webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+	-o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+	transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+
+.add-name {
+	margin-top: 40px;
+}
+
+a#add-name-header {
+	color: black;
+	text-decoration: none;
+	font-family: 'Montserrat', sans-serif;
+}
+
+a#add-name-header:hover {
+	color: #505050;
+	text-decoration: none;
+	font-family: 'Montserrat', sans-serif;
+}
+
+a#add-name-header:active {
+	color: #505050;
+	text-decoration: none;
+	font-family: 'Montserrat', sans-serif;
+}
+
+.remove-button {
+	color: #E0E0E0;
+	font-family: 'Nunito', sans-serif;
+}
+
+.remove-button:hover {
+	color: #d9534f;
+	text-decoration: none;
+	font-family: 'Nunito', sans-serif;
+}
+
+.add-button {
+	color: #E0E0E0 ;
+	font-family: 'Nunito', sans-serif;
+}
+
+.add-button:hover {
+	color: #5cb85c;
+	text-decoration: none;
+	font-family: 'Nunito', sans-serif;
+}
