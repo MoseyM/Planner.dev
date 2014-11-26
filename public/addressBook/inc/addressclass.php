@@ -8,24 +8,16 @@ class AddressBook
 		$this->dbc = $dbc;
 	}
 
-	function deleteEntryPerson()
+	function deleteEntryPerson($id)
 	{
-		//delete item from both tables	    
-        if(isset($_GET['id']))
-        {
-            $id = $_GET['id'];
-            $this->dbc->query("DELETE FROM person WHERE id=$id");
-        }
+		//delete item from persons
+        $this->dbc->query("DELETE FROM person WHERE id=$id");
     }
 
-   	function deleteEntryAddress() 
+   	function deleteEntryAddress($id) 
    	{
-        if(isset($_GET['address']))
-        {
-        	$id = $_GET['id'];
             // $removeAddress = $_GET['address'];
-            $this->dbc->query("DELETE FROM addresses WHERE person_id=$id");
-        }    
+            $this->dbc->query("DELETE FROM addresses WHERE person_id=$id");  
 	}
 
 	function addEntryPerson()

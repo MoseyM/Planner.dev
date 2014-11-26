@@ -9,12 +9,20 @@
     require_once '../inc/addressClass.php';
 
     $address = new AddressBook($dbc);
-
     if(!empty($_GET))
         { 
-            $address->deleteEntryPerson();
-            $address->deleteEntryAddress(); 
+            $id = $_GET['id'];
+            if(isset($_GET['id']))
+            {
+                $address->deleteEntryPerson($id);
+            }
+            if(isset($_GET['address']))
+            {
+                $idAddress = $_GET['address'];
+                $address->deleteEntryAddress($idAddress); 
+            }
             header("Location: http://planner.dev/addressBook/template/index.php");
+
         }
 
     $addressInfo = $address->definePageNumber();
