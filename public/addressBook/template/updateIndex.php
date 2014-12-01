@@ -7,28 +7,28 @@
     define("DB_PASS", 'password');
 
     require '../inc/db_connect.php';
-    require_once '../inc/addressclass.php';
-
-    $UseInfo = new AddressClass($dbc);
     
 //find total number of rows and build pagination from that count
     $pageLimit = 10;
     $count = $dbc->query("SELECT COUNT(*) FROM addresses");
     $pageCount = $count->fetchColumn();
     $pages = ceil($pageCount / $pageLimit);
-    $lastPage = $pages;    
+    $lastPage = $pages;
+    
+    $addresses = [];
+    
 //define page number
     (isset($_GET['page']) && $_GET['page'] >= 1) ? $current_page = $_GET['page'] : $current_page = 1;
-    //query "addresses" database    
-    $addressInfo = $UseInfo->getAddressData($current_page, $pageLimit);
+    
 //delete item
     if(!empty($_GET))
     {
+        //refactor with placeholders
         if(!empty($_GET['id']))
             {
                 $id = $_GET['id'];
                 $stmt = $dbc->query("DELETE FROM person WHERE id=$id");
-                header($UseInfo->location);
+                header("Location: http://planner.dev/addressBook/template/index.php");
             }
         if(!empty($_GET['address']))
         {
@@ -39,26 +39,117 @@
             $stmt = $dbc->prepare($query);
             
             $stmt->bindValue(':person_id',  $_GET['address'],  PDO::PARAM_STR);
+            // $stmt->bindValue(':email', NULL,  PDO::PARAM_STR);
+            // $stmt->bindValue(':phone', NULL,  PDO::PARAM_STR);
+            // $stmt->bindValue(':address', NULL,  PDO::PARAM_STR);
+            // $stmt->bindValue(':city',  NULL,  PDO::PARAM_STR);
+            // $stmt->bindValue(':state', NULL,  PDO::PARAM_STR);
+            // $stmt->bindValue(':zip', NULL,  PDO::PARAM_STR);
+
             
             $stmt->execute();
             $contactId = $dbc->lastInsertId();
-        }  
+            // header("Location: http://planner.dev/addressBook/template/index.php");
+
+        }
+        
     }
+
+//query "addresses" database
+    $offsetQuery = ($current_page -1) *10;
+    $query = "SELECT person.id, firstname, lastname, email, phone, address, city, state, zip, addresses.id AS add_id, person_id
+        FROM person LEFT JOIN addresses ON addresses.person_id = person.id  LIMIT :pageLimit OFFSET :offset";
+    $stmt = $dbc->prepare($query);
+
+    $stmt->bindValue(':pageLimit',  $pageLimit,  PDO::PARAM_INT);
+    $stmt->bindValue(':offset',  $offsetQuery,  PDO::PARAM_INT);
+
+    $stmt->execute();
+    
+    $addressInfo = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
 //checking $_POST for submission
     if(!empty($_POST))
     {
-        $UseInfo->addresses = $_POST;
+        
     //validating name is set
-        if((isset($UseInfo->addresses['firstname'])) && (isset($UseInfo->addresses['lastname'])))
-        {       
-        	$UseInfo->insertPerson();
-            header($UseInfo->location);
-        } else if(isset($UseInfo->addresses['hidden_id'])) {
+        if((isset($_POST['firstname'])) && (isset($_POST['lastname'])))
+        {
+            
+        // logic for person table
+            $query = "INSERT INTO person (firstname, lastname) 
+                       VALUES (:firstname, :lastname)";
+            
+            $stmt = $dbc->prepare($query);
+            
+            $stmt->bindValue(':firstname',  $_POST['firstname'],  PDO::PARAM_STR);
+            $stmt->bindValue(':lastname',  $_POST['lastname'],  PDO::PARAM_STR);
+            
+            $stmt->execute();
+            $contactId = $dbc->lastInsertId();
+            
+            !empty($_POST['email']) ? $_POST['email'] : null;
+            !empty($_POST['phone']) ? $_POST['phone'] : null;
+            !empty($_POST['address']) ? $_POST['address'] : null;
+            !empty($_POST['city']) ? $_POST['city'] : null;
+            !empty($_POST['state']) ? $_POST['state'] : null;
+            !empty($_POST['zip']) ? $_POST['zip'] : null;
+            
+        // logic for addresses table
+            $query = "INSERT INTO addresses (person_id, email, phone, address, city, state, zip) 
+                        VALUES (:person_id, :email, :phone, :address, :city, :state, :zip)";
+                        
+            $stmt = $dbc->prepare($query);
+
+            $stmt->bindValue(':person_id',  $contactId,  PDO::PARAM_STR);
+            $stmt->bindValue(':email',  $_POST['email'],  PDO::PARAM_STR);
+            $stmt->bindValue(':phone',  $_POST['phone'],  PDO::PARAM_STR);
+            $stmt->bindValue(':address',  $_POST['address'],  PDO::PARAM_STR);
+            $stmt->bindValue(':city',  $_POST['city'],  PDO::PARAM_STR);
+            $stmt->bindValue(':state',  $_POST['state'],  PDO::PARAM_STR);
+            $stmt->bindValue(':zip',  $_POST['zip'],  PDO::PARAM_STR);
+            
+            $stmt->execute();
+            header("Location: http://planner.dev/addressBook/template/index.php");
+        }else if(isset($_POST['hidden_id']))
+        {
+
         // editing address table
-            $UseInfo->editAddress();
-            $UseInfo->editPerson();
-            header($UseInfo->location); 
+            $query = "UPDATE person
+                        SET firstname = :firstname, lastname = :lastname
+                        WHERE id = :id";
+                        
+            $stmt = $dbc->prepare($query);
+                        
+            $stmt->bindValue(':firstname',  $_POST['edit_firstname'],  PDO::PARAM_STR);
+            $stmt->bindValue(':lastname',  $_POST['edit_lastname'],  PDO::PARAM_STR);
+            $stmt->bindValue(':id',  $_POST['hidden_id'],  PDO::PARAM_STR);
+            
+            
+            $stmt->execute();
+            
+        // editing person table
+            $query = "UPDATE addresses 
+                        SET email = :email, phone = :phone, address = :address, city = :city, state = :state, zip = :zip
+                        WHERE person_id = :person_id";
+            
+            $stmt = $dbc->prepare($query);
+            
+            $stmt->bindValue(':person_id',  $_POST['hidden_id'],  PDO::PARAM_STR);
+            $stmt->bindValue(':email',  $_POST['edit_email'],  PDO::PARAM_STR);
+            $stmt->bindValue(':phone',  $_POST['edit_phone'],  PDO::PARAM_STR);
+            $stmt->bindValue(':address',  $_POST['edit_address'],  PDO::PARAM_STR);
+            $stmt->bindValue(':city',  $_POST['edit_city'],  PDO::PARAM_STR);
+            $stmt->bindValue(':state',  $_POST['edit_state'],  PDO::PARAM_STR);
+            $stmt->bindValue(':zip',  $_POST['edit_zip'],  PDO::PARAM_STR);
+
+            
+            $stmt->execute();
+            $contactId = $dbc->lastInsertId();
+            header("Location: http://planner.dev/addressBook/template/index.php");
+            
         }
+            
     }
 ?>
 <!DOCTYPE html>
